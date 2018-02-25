@@ -102,13 +102,14 @@ function performMatchmaking( playerName, calldone )
 
 function openGameExists( playerName, createGame, matchGame, calldone )
 {
+    console.log("openGameExists:", JSON.stringify(playerName));
     // scan will get longer the more games are played. 
     // TODO: solve. e.g. finished games can be moved to a new table?
     // TODO: replace with query - more efficient and we only need first found.
     // TODO: check if same player tries to open another game and reject
     var scanIsGameOpen = {
         TableName : TableModel.TableName,
-        FilterExpression: `attribute_not_exists(${TableModel.Item.player2})`
+        FilterExpression: `attribute_not_exists(player2)`
     };
     
     dynamo.scan(scanIsGameOpen, function(err, data) {
