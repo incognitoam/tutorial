@@ -5,7 +5,7 @@ var fs = require('fs');
    var contents = fs.readFileSync("public/index.html");
    context.succeed({
      statusCode: 400,
-     body: contents.toString(),
+     body: {"fail"} /*contents.toString()*/,
      headers: {'Content-Type': 'text/html'}
    });
  };
