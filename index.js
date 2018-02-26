@@ -186,9 +186,16 @@ function createNewGame( playerName, calldone )
 function functionProcessGET( queryStringParameters, calldone )
 {
     console.log("functionProcessGET:", JSON.stringify(queryStringParameters, null, 2));
-    //var parsed = JSON.parse(queryStringParameters);
+
+    // if game_id exists - retrieve state for current game
+    // TODO: Get can also be used to get a list of all games active for this player
+    // will crash if no game_id is specified
     var game_id = queryStringParameters.game_id;
-    
+    getGameState( game_id, calldone );
+};
+
+function getGameState( game_id, calldone )
+{
     var query = {
         TableName: TableModel.TableName,
         KeyConditionExpression: "game_id = :a",
@@ -210,11 +217,8 @@ function functionProcessGET( queryStringParameters, calldone )
             calldone( new Error(`Unexpected number of games with this gameId: ${data.Count}`));
         }
     }
-    });
-    
-
-    //calldone( new Error("Not implemented"), JSON.stringify(queryStringParameters, null, 2));
-};
+    });    
+}
 
 function trialAndError()
 {
