@@ -32,7 +32,7 @@ function processRequest (event, context, calldone) {
             result = "DELETE unsupported";
             break;
         case 'GET':
-            result = "GET unsupported";
+            result = functionProcessGET( event.queryStringParameters, calldone);
             break;
         case 'POST':
             result = functionProcessPOST( event.body, calldone );
@@ -69,7 +69,8 @@ var TableModel =
 var GameStates =
 {
     pending : "pending",
-    inprogress: "inprogress",
+    move1: "move1",
+    move2: "move2",
     winner1 : "winner1",
     winner2 : "winner2",
     draw : "draw"
@@ -181,6 +182,39 @@ function createNewGame( playerName, calldone )
     calldone( null, `Game created for "${playerName}": "${createRequest.Item.gameId}"`);
 };
 
+// GET - retrieve game state
+function functionProcessGET( queryStringParameters, calldone )
+{
+    console.log("functionProcessGET:", JSON.stringify(queryStringParameters, null, 2));
+    //var parsed = JSON.parse(queryStringParameters);
+    var game_id = queryStringParameters.game_id;
+    
+    var query = {
+        TableName: TableModel.TableName,
+        KeyConditionExpression: "game_id = :a",
+        ExpressionAttributeValues: {
+            ":a": game_id
+        }
+    };
+    dynamo.query(query, function(err, data) {
+    if (err) {
+        console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+    } else {
+        console.log("Query returned:", JSON.stringify(data, null, 2));
+
+        if(data.Count == 1)
+        {
+            calldone( null, JSON.stringify(data.Items[0]), null, 2);
+        }
+        else{
+            calldone( new Error(`Unexpected number of games with this gameId: ${data.Count}`));
+        }
+    }
+    });
+    
+
+    //calldone( new Error("Not implemented"), JSON.stringify(queryStringParameters, null, 2));
+};
 
 function trialAndError()
 {
